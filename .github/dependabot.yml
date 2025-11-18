@@ -1,14 +1,104 @@
 version: 2
+
+# Configure Dependabot to manage dependencies across all languages and ecosystems
 updates:
-- package-ecosystem: npm
-  directory: /.github/workflows
-  schedule:
-    interval: weekly
-- package-ecosystem: pip
-  directory: /.github/workflows
-  schedule:
-    interval: weekly
-- package-ecosystem: gomod
-  directory: /.github/workflows
-  schedule:
-    interval: weekly
+  # Go module dependencies (main application)
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:00"
+    open-pull-requests-limit: 10
+    rebase-strategy: auto
+    commit-message:
+      prefix: "build(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "go"
+    reviewers:
+      - "pressdarling/maintainers"
+    assignees:
+      - "pressdarling"
+
+  # npm dependencies in documentation site (Astro + Playwright)
+  - package-ecosystem: npm
+    directory: /docs
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:00"
+    open-pull-requests-limit: 10
+    rebase-strategy: auto
+    commit-message:
+      prefix: "build(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "documentation"
+    reviewers:
+      - "pressdarling/maintainers"
+    allow:
+      - dependency-type: all
+    ignore:
+      # Ignore major version updates for key infrastructure packages
+      # These can be reviewed and updated separately
+
+  # npm dependencies in workflow JavaScript utilities
+  - package-ecosystem: npm
+    directory: /pkg/workflow/js
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+    open-pull-requests-limit: 10
+    rebase-strategy: auto
+    commit-message:
+      prefix: "build(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "workflow"
+    reviewers:
+      - "pressdarling/maintainers"
+    allow:
+      - dependency-type: all
+
+  # GitHub Actions - keep actions up to date for security
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: tuesday
+      time: "03:00"
+    open-pull-requests-limit: 10
+    rebase-strategy: auto
+    commit-message:
+      prefix: "ci(deps)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "pressdarling/maintainers"
+
+  # Docker image updates (if any Dockerfiles are present)
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: wednesday
+      time: "03:00"
+    open-pull-requests-limit: 5
+    rebase-strategy: auto
+    commit-message:
+      prefix: "build(docker)"
+      include: scope
+    labels:
+      - "dependencies"
+      - "docker"
+    reviewers:
+      - "pressdarling/maintainers"
